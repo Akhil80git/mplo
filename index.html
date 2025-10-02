@@ -1,0 +1,307 @@
+# mplo <!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multi-Device Preview</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  .container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 25px;
+    padding: 15px;
+    width: 100%;
+    min-width: 1400px;
+  }
+
+  .device-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .redmi-box {
+    width: 81.2mm;
+    height: 178mm;
+    border: 2px solid #e53935;
+    border-radius: 12px;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .iphone-box {
+    width: 71.6mm;
+    height: 147.6mm;
+    border: 2px solid #1976d2;
+    border-radius: 24px;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .desktop-box {
+    width: 800px;
+    height: 500px;
+    border: 2px solid #43a047;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  }
+
+  .iphone-controls {
+    margin-top: 10px;
+    width: 71.6mm;
+    background-color: white;
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .compact-input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  .compact-buttons {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .compact-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #2c3e50;
+    color: white;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .compact-btn:hover {
+    background-color: #34495e;
+  }
+
+  iframe {
+    border: none;
+    transform-origin: top left;
+  }
+
+  /* iPhone frame को properly scale करने के लिए */
+  #iphoneFrame {
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+  }
+
+  /* Desktop frame को proper viewport देना */
+  #desktopFrame {
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+  }
+
+  /* Desktop के लिए proper viewport meta tag inject करना */
+  .desktop-viewport {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Desktop frame को responsive बनाने के लिए */
+  .desktop-frame-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    position: relative;
+  }
+  
+  .desktop-frame-wrapper {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    position: relative;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="device-container">
+      <div class="redmi-box">
+        <iframe id="previewFrame" src="about:blank"></iframe>
+      </div>
+    </div>
+    
+    <div class="device-container">
+      <div class="iphone-box">
+        <iframe id="iphoneFrame" src="about:blank"></iframe>
+      </div>
+      <div class="iphone-controls">
+        <input type="text" id="urlInput" placeholder="Enter URL (e.g., example.com)" class="compact-input" />
+        <div class="compact-buttons">
+          <button class="compact-btn" onclick="loadURL()">Load</button>
+          <button class="compact-btn" onclick="openNewWindow()">Open</button>
+          <button class="compact-btn" onclick="clearFrames()">Clear</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="device-container">
+      <div class="desktop-box">
+        <div class="desktop-frame-container">
+          <div class="desktop-frame-wrapper">
+            <iframe id="desktopFrame" src="about:blank" class="desktop-viewport"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadURL() {
+      let url = document.getElementById('urlInput').value.trim();
+      if (url) {
+        // अगर URL में http:// या https:// नहीं है, तो https:// जोड़ दो (default secure)
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        
+        // Redmi और iPhone के लिए mobile view
+        document.getElementById('previewFrame').src = url;
+        document.getElementById('iphoneFrame').src = url;
+        
+        // Desktop frame को load करना
+        const desktopFrame = document.getElementById('desktopFrame');
+        desktopFrame.src = url;
+        
+        // Desktop frame को proper viewport देना
+        setTimeout(() => {
+          try {
+            const desktopDoc = desktopFrame.contentDocument || desktopFrame.contentWindow.document;
+            const viewportMeta = desktopDoc.createElement('meta');
+            viewportMeta.name = 'viewport';
+            viewportMeta.content = 'width=device-width, initial-scale=1.0';
+            desktopDoc.head.appendChild(viewportMeta);
+            
+            // Desktop frame को responsive बनाने के लिए
+            adjustDesktopScale();
+          } catch(e) {
+            console.log('Cannot modify iframe content');
+          }
+        }, 1000);
+        
+      } else {
+        alert('Please enter a valid URL');
+      }
+    }
+
+    function openNewWindow() {
+      let url = document.getElementById('urlInput').value.trim();
+      if (url) {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        window.open(url, '_blank');
+      } else {
+        alert('Please enter a valid URL');
+      }
+    }
+
+    function clearFrames() {
+      document.getElementById('previewFrame').src = 'about:blank';
+      document.getElementById('iphoneFrame').src = 'about:blank';
+      document.getElementById('desktopFrame').src = 'about:blank';
+      document.getElementById('urlInput').value = '';
+    }
+
+    function adjustRedmiScale() {
+      const mobileWidth = 375;
+      const mobileHeight = 812;
+      const box = document.querySelector('.redmi-box');
+      const boxWidth = box.clientWidth;
+      const boxHeight = box.clientHeight;
+      const scaleX = boxWidth / mobileWidth;
+      const scaleY = boxHeight / mobileHeight;
+      const scale = Math.min(scaleX, scaleY);
+      const iframe = document.getElementById('previewFrame');
+      iframe.style.width = `${mobileWidth}px`;
+      iframe.style.height = `${mobileHeight}px`;
+      iframe.style.transform = `scale(${scale})`;
+    }
+    
+    function adjustDesktopScale() {
+      const desktopFrame = document.getElementById('desktopFrame');
+      const wrapper = document.querySelector('.desktop-frame-wrapper');
+      
+      try {
+        const desktopDoc = desktopFrame.contentDocument || desktopFrame.contentWindow.document;
+        const bodyWidth = desktopDoc.body.scrollWidth;
+        const containerWidth = document.querySelector('.desktop-box').clientWidth;
+        
+        // अगर content container से बड़ा है, तो scale करो
+        if (bodyWidth > containerWidth) {
+          const scale = containerWidth / bodyWidth;
+          wrapper.style.transform = `scale(${scale})`;
+          wrapper.style.width = `${bodyWidth}px`;
+          wrapper.style.height = `${desktopDoc.body.scrollHeight}px`;
+        } else {
+          wrapper.style.transform = 'none';
+          wrapper.style.width = '100%';
+          wrapper.style.height = '100%';
+        }
+      } catch(e) {
+        console.log('Cannot access iframe content');
+      }
+    }
+
+    // Initial adjust
+    window.addEventListener('load', () => {
+      adjustRedmiScale();
+    });
+
+    // Adjust on resize
+    window.addEventListener('resize', () => {
+      adjustRedmiScale();
+      adjustDesktopScale();
+    });
+    
+    // Desktop frame के content के load होने पर scale adjust करो
+    document.getElementById('desktopFrame').addEventListener('load', () => {
+      setTimeout(adjustDesktopScale, 500);
+    });
+  </script>
+</body>
+</html> 
