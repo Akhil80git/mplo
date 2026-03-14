@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix Pro - Static Resize (No Refresh)</title>
+    <title>🚀 Matrix Pro - 100% Auto-Fit Resize</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: #03050a; min-height: 100vh; padding: 15px; overflow: hidden; color: white; }
@@ -17,7 +17,7 @@
 
         .redmi-col { 
             flex: 0 0 auto; 
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth resize */
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .redmi-frame { 
@@ -29,8 +29,17 @@
 
         .redmi-frame:focus-within { border-color: #ff3b3b; }
 
-        .scale-wrapper { width: 375px; transform-origin: top left; height: 100%; }
-        iframe { border: none; width: 100%; height: 100%; display: block; background: white; }
+        /* Content Wrapper - यह मुख्य है */
+        .scale-wrapper { 
+            width: 375px; /* Mobile Standard Width */
+            transform-origin: top left; 
+            height: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        iframe { border: none; width: 100%; height: 2000px; display: block; background: white; }
 
         /* Control Panel */
         .control-panel { 
@@ -84,7 +93,7 @@
     <div class="redmi-grid" id="redmiGrid"></div>
     
     <div class="control-panel">
-        <h1 class="panel-header">⚡ MATRIX RESIZER</h1>
+        <h1 class="panel-header">⚡ MATRIX AUTO-FIT</h1>
         
         <div id="urlList"></div>
         
@@ -94,14 +103,13 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'matrix_resize_v5';
+    const STORAGE_KEY = 'matrix_autofit_v6';
     let devices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
         { id: "dev_" + Date.now(), url: '', width: 300, height: 600 }
     ];
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
 
-    // पहली बार ग्रिड रेंडर करना
     function initGrid() {
         const grid = document.getElementById('redmiGrid');
         grid.innerHTML = '';
@@ -109,7 +117,6 @@
         renderControlPanel();
     }
 
-    // नया बॉक्स सिर्फ DOM में जोड़ना (बिना रिफ्रेश के)
     function createBoxInDOM(dev) {
         const grid = document.getElementById('redmiGrid');
         const col = document.createElement('div');
@@ -125,10 +132,9 @@
             </div>
         `;
         grid.appendChild(col);
-        applyScaling(dev.id);
+        setTimeout(() => applyScaling(dev.id), 50); 
     }
 
-    // कंट्रोल पैनल रेंडर करना
     function renderControlPanel() {
         const list = document.getElementById('urlList');
         list.innerHTML = '';
@@ -137,16 +143,16 @@
             const row = document.createElement('div');
             row.className = 'url-row';
             row.innerHTML = `
-                <span class="device-label">BOX #${index + 1} (${dev.id.slice(-4)})</span>
+                <span class="device-label">BOX #${index + 1}</span>
                 <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ डालें" value="${dev.url}">
                 
                 <div class="dim-inputs">
-                    <input type="number" id="w-${dev.id}" value="${dev.width}" title="Width">
-                    <input type="number" id="h-${dev.id}" value="${dev.height}" title="Height">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="W">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="H">
                 </div>
 
                 <div class="btn-group">
-                    <button class="apply-btn" onclick="applySizeOnly('${dev.id}')">✅ APPLY SIZE (NO REFRESH)</button>
+                    <button class="apply-btn" onclick="applySizeOnly('${dev.id}')">✅ APPLY & AUTO-FIT</button>
                     <div class="row-actions">
                         <button class="load-btn" onclick="loadUrlOnly('${dev.id}')">⚡ LOAD WEB</button>
                         <button class="del-btn" onclick="removeDevice('${dev.id}')">DEL</button>
@@ -157,7 +163,7 @@
         });
     }
 
-    // **मुख्य फंक्शन: सिर्फ साइज बदलना बिना रिफ्रेश के**
+    // साइज बदलें और कंटेंट को ऑटो-स्केल करें
     function applySizeOnly(id) {
         const newW = document.getElementById(`w-${id}`).value;
         const newH = document.getElementById(`h-${id}`).value;
@@ -168,15 +174,31 @@
             dev.height = parseInt(newH);
             save();
 
-            // सीधा CSS अपडेट (इससे iFrame रिफ्रेश नहीं होगा)
             const col = document.getElementById(`col-${id}`);
             const frame = document.getElementById(`frame-${id}`);
             
             if(col) col.style.width = newW + 'px';
             if(frame) frame.style.height = newH + 'px';
             
-            // स्केल ठीक करें
-            applyScaling(id);
+            // कंटेंट को 100% फिट करने के लिए यहाँ जादू है
+            setTimeout(() => applyScaling(id), 100);
+        }
+    }
+
+    function applyScaling(id) {
+        const frame = document.getElementById(`frame-${id}`);
+        const wrapper = document.getElementById(`scale-${id}`);
+        if (frame && wrapper) {
+            const currentFrameWidth = frame.clientWidth;
+            const currentFrameHeight = frame.clientHeight;
+
+            // यह कैलकुलेट करता है कि मोबाइल व्यू (375px) को वर्तमान बॉक्स में फिट करने के लिए कितना स्केल चाहिए
+            const scaleFactor = currentFrameWidth / 375;
+            
+            wrapper.style.transform = `scale(${scaleFactor})`;
+            
+            // हाइट को भी स्केल के हिसाब से एडजस्ट करें ताकि स्क्रॉल सही रहे
+            wrapper.style.height = (currentFrameHeight / scaleFactor) + "px";
         }
     }
 
@@ -190,19 +212,7 @@
         save();
 
         const iframe = document.getElementById(`iframe-${id}`);
-        // सिर्फ इसी एक इफ़्रेम को लोड करें
         iframe.src = finalUrl || 'about:blank';
-    }
-
-    function applyScaling(id) {
-        const dev = devices.find(d => d.id === id);
-        const frame = document.getElementById(`frame-${id}`);
-        const wrapper = document.getElementById(`scale-${id}`);
-        if (frame && wrapper) {
-            const scale = frame.clientWidth / 375;
-            wrapper.style.transform = `scale(${scale})`;
-            wrapper.style.height = (frame.clientHeight / scale) + 'px';
-        }
     }
 
     function addDevice() {
@@ -225,6 +235,7 @@
     }
 
     window.onload = initGrid;
+    // स्क्रीन रिसाइज होने पर भी सब फिट रहे
     window.onresize = () => devices.forEach(d => applyScaling(d.id));
 </script>
 
