@@ -239,7 +239,8 @@
                     name="${dev.sessionId}"
                     src="${dev.url || 'about:blank'}"
                     credentialless
-                    allow="clipboard-write; camera; microphone"
+                    allow="clipboard-write; camera; microphone; popups; popups-to-escape-sandbox"
+                    sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals allow-top-navigation"
                     referrerpolicy="no-referrer"
                 ></iframe>
             </div>
