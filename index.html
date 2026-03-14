@@ -2,135 +2,231 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix Pro Max - Anti-Conflict Edition</title>
+    <title>🚀 Matrix Pro - Static Resize (No Refresh)</title>
     <style>
-        /* CSS पहले जैसा ही रहेगा, सिर्फ फंक्शनलिटी में बदलाव है */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #03050a; min-height: 100vh; padding: 15px; overflow-x: auto; color: white; }
-        .dashboard { display: flex; gap: 15px; align-items: flex-start; }
-        .redmi-grid { display: flex; flex-wrap: wrap; gap: 10px; flex: 1; }
-        .redmi-col { flex: 0 0 auto; position: relative; }
-        .redmi-frame { background: #fff; border-radius: 20px; overflow: hidden; border: 2px solid #ff3b3b; position: relative; }
-        .scale-wrapper { width: 375px; transform-origin: top left; }
-        iframe { border: none; width: 100%; height: 100%; display: block; }
-        .control-panel { width: 300px; background: rgba(15, 15, 25, 0.98); border-radius: 20px; padding: 15px; border: 1px solid #ff3b3b; position: sticky; top: 10px; max-height: 95vh; overflow-y: auto; }
-        .url-row { background: #111; border-radius: 12px; padding: 12px; border: 1px solid #222; margin-bottom: 12px; }
-        .url-input { width: 100%; padding: 8px; background: #1e1e2a; border: 1px solid #444; color: white; border-radius: 6px; font-size: 11px; margin-bottom: 8px; }
-        .dim-inputs { display: flex; gap: 5px; margin-bottom: 8px; }
-        .dim-inputs input { width: 50%; padding: 6px; background: #000; border: 1px solid #ff3b3b; color: #fff; border-radius: 4px; font-size: 11px; }
-        button { cursor: pointer; font-weight: 600; border-radius: 6px; border: none; font-size: 11px; padding: 7px; }
-        .load-btn { background: #ff3b3b; color: white; width: 70%; }
-        .del-btn { background: #222; color: #ff6666; width: 28%; }
-        .add-btn { width: 100%; padding: 12px; background: #00ffcc; color: #000; font-weight: bold; margin-bottom: 10px; }
+        body { background: #03050a; min-height: 100vh; padding: 15px; overflow: hidden; color: white; }
+        
+        .main-container { display: flex; height: 98vh; gap: 15px; }
+        
+        /* Grid Area */
+        .redmi-grid { 
+            display: flex; flex-wrap: wrap; gap: 15px; flex: 1; 
+            overflow-y: auto; align-content: flex-start; padding: 10px;
+        }
+
+        .redmi-col { 
+            flex: 0 0 auto; 
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth resize */
+        }
+        
+        .redmi-frame { 
+            background: #fff; border-radius: 25px; overflow: hidden; 
+            border: 3px solid #333; position: relative;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .redmi-frame:focus-within { border-color: #ff3b3b; }
+
+        .scale-wrapper { width: 375px; transform-origin: top left; height: 100%; }
+        iframe { border: none; width: 100%; height: 100%; display: block; background: white; }
+
+        /* Control Panel */
+        .control-panel { 
+            width: 320px; background: #0f111a; border-radius: 20px; 
+            padding: 20px; border: 1px solid #ff3b3b; overflow-y: auto;
+        }
+
+        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+
+        .url-row { 
+            background: #1a1d29; border-radius: 15px; padding: 12px; 
+            border: 1px solid #333; margin-bottom: 15px;
+        }
+
+        .device-label { color: #00ffcc; font-size: 11px; font-weight: bold; margin-bottom: 8px; display: block; }
+
+        .url-input { 
+            width: 100%; padding: 8px; background: #05070a; border: 1px solid #444; 
+            color: white; border-radius: 6px; font-size: 11px; margin-bottom: 10px;
+        }
+
+        .dim-inputs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .dim-inputs input { 
+            width: 50%; padding: 8px; background: #000; border: 1px solid #444; 
+            color: #00ffcc; border-radius: 6px; font-size: 12px; text-align: center;
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 5px; }
+        .row-actions { display: flex; gap: 5px; }
+
+        button { cursor: pointer; font-weight: bold; border-radius: 8px; border: none; transition: 0.2s; font-size: 11px; }
+        
+        .apply-btn { background: #00ffcc; color: #000; padding: 8px; width: 100%; margin-bottom: 5px; }
+        .apply-btn:hover { background: #00d4aa; }
+
+        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 8px; }
+        .del-btn { flex: 1; background: #333; color: #ff4444; padding: 8px; }
+
+        .add-btn { 
+            width: 100%; padding: 12px; background: #ff3b3b; color: white; 
+            font-size: 13px; margin-bottom: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #ff3b3b; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
+<div class="main-container">
     <div class="redmi-grid" id="redmiGrid"></div>
+    
     <div class="control-panel">
-        <h2 style="color:#ff3b3b; text-align:center; margin-bottom:15px;">🚀 MATRIX PRO MAX</h2>
+        <h1 class="panel-header">⚡ MATRIX RESIZER</h1>
+        
         <div id="urlList"></div>
-        <button class="add-btn" onclick="addDevice()">➕ ADD NEW DEVICE</button>
-        <button onclick="loadAll()" style="width:100%; background:#444; color:white; margin-bottom:5px;">⚡ REFRESH ALL</button>
-        <button onclick="clearAll()" style="width:100%; background:transparent; color:#ff6666; border:1px solid #444;">🧹 CLEAR STORAGE</button>
+        
+        <button class="add-btn" onclick="addDevice()">➕ ADD NEW BOX</button>
+        <button onclick="clearAllData()" style="width: 100%; background: none; border: none; color: #444; font-size: 10px; cursor: pointer;">Reset All Data</button>
     </div>
 </div>
 
 <script>
-    let devices = JSON.parse(localStorage.getItem('matrix_session_v4')) || [
-        { id: "dev1", name: "Device 1", url: '', width: 300, height: 600 }
+    const STORAGE_KEY = 'matrix_resize_v5';
+    let devices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+        { id: "dev_" + Date.now(), url: '', width: 300, height: 600 }
     ];
 
-    function save() { localStorage.setItem('matrix_session_v4', JSON.stringify(devices)); }
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
 
-    function render() {
+    // पहली बार ग्रिड रेंडर करना
+    function initGrid() {
         const grid = document.getElementById('redmiGrid');
-        const list = document.getElementById('urlList');
-        grid.innerHTML = ''; list.innerHTML = '';
+        grid.innerHTML = '';
+        devices.forEach(dev => createBoxInDOM(dev));
+        renderControlPanel();
+    }
 
-        devices.forEach((dev, index) => {
-            // Unique URL generation to trick the browser session
-            let finalUrl = dev.url;
-            if(finalUrl && finalUrl !== 'about:blank') {
-                const separator = finalUrl.includes('?') ? '&' : '?';
-                finalUrl = `${finalUrl}${separator}matrixId=${dev.id}`;
-            }
-
-            // Grid Layout
-            const col = document.createElement('div');
-            col.className = 'redmi-col';
-            col.style.width = dev.width + 'px';
-            col.innerHTML = `
-                <div class="redmi-frame" id="frame-${dev.id}" style="height: ${dev.height}px;">
-                    <div class="scale-wrapper" id="scale-${dev.id}">
-                        <iframe id="iframe-${dev.id}" src="${finalUrl || 'about:blank'}" allow="clipboard-write"></iframe>
-                    </div>
+    // नया बॉक्स सिर्फ DOM में जोड़ना (बिना रिफ्रेश के)
+    function createBoxInDOM(dev) {
+        const grid = document.getElementById('redmiGrid');
+        const col = document.createElement('div');
+        col.className = 'redmi-col';
+        col.id = `col-${dev.id}`;
+        col.style.width = dev.width + 'px';
+        
+        col.innerHTML = `
+            <div class="redmi-frame" id="frame-${dev.id}" style="height: ${dev.height}px;">
+                <div class="scale-wrapper" id="scale-${dev.id}">
+                    <iframe id="iframe-${dev.id}" src="${dev.url || 'about:blank'}"></iframe>
                 </div>
-            `;
-            grid.appendChild(col);
+            </div>
+        `;
+        grid.appendChild(col);
+        applyScaling(dev.id);
+    }
 
-            // Control Row
+    // कंट्रोल पैनल रेंडर करना
+    function renderControlPanel() {
+        const list = document.getElementById('urlList');
+        list.innerHTML = '';
+        
+        devices.forEach((dev, index) => {
             const row = document.createElement('div');
             row.className = 'url-row';
             row.innerHTML = `
-                <label style="color:#00ffcc; font-size:10px;">BOX ID: ${dev.id}</label>
-                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ डालें..." value="${dev.url}" oninput="updateData('${dev.id}', 'url', this.value)">
+                <span class="device-label">BOX #${index + 1} (${dev.id.slice(-4)})</span>
+                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ डालें" value="${dev.url}">
+                
                 <div class="dim-inputs">
-                    <input type="number" value="${dev.width}" oninput="updateData('${dev.id}', 'width', this.value)" placeholder="W">
-                    <input type="number" value="${dev.height}" oninput="updateData('${dev.id}', 'height', this.value)" placeholder="H">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" title="Width">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" title="Height">
                 </div>
-                <div style="display:flex; gap:5px;">
-                    <button class="load-btn" onclick="loadSingle('${dev.id}')">LOGIN/LOAD</button>
-                    <button class="del-btn" onclick="removeDevice('${dev.id}')">DEL</button>
+
+                <div class="btn-group">
+                    <button class="apply-btn" onclick="applySizeOnly('${dev.id}')">✅ APPLY SIZE (NO REFRESH)</button>
+                    <div class="row-actions">
+                        <button class="load-btn" onclick="loadUrlOnly('${dev.id}')">⚡ LOAD WEB</button>
+                        <button class="del-btn" onclick="removeDevice('${dev.id}')">DEL</button>
+                    </div>
                 </div>
             `;
             list.appendChild(row);
         });
-        setTimeout(applyScaling, 100);
     }
 
-    function updateData(id, key, val) {
-        const dev = devices.find(d => d.id === id);
-        if(dev) { dev[key] = val; save(); }
-    }
-
-    function loadSingle(id) {
-        const dev = devices.find(d => d.id === id);
-        const iframe = document.getElementById(`iframe-${id}`);
-        let inputUrl = document.getElementById(`in-url-${id}`).value.trim();
+    // **मुख्य फंक्शन: सिर्फ साइज बदलना बिना रिफ्रेश के**
+    function applySizeOnly(id) {
+        const newW = document.getElementById(`w-${id}`).value;
+        const newH = document.getElementById(`h-${id}`).value;
         
-        if(inputUrl && !/^https?:\/\//i.test(inputUrl)) inputUrl = 'https://' + inputUrl;
-        dev.url = inputUrl;
-        save();
-        render(); // Re-render to apply unique matrixId in URL
+        const dev = devices.find(d => d.id === id);
+        if(dev) {
+            dev.width = parseInt(newW);
+            dev.height = parseInt(newH);
+            save();
+
+            // सीधा CSS अपडेट (इससे iFrame रिफ्रेश नहीं होगा)
+            const col = document.getElementById(`col-${id}`);
+            const frame = document.getElementById(`frame-${id}`);
+            
+            if(col) col.style.width = newW + 'px';
+            if(frame) frame.style.height = newH + 'px';
+            
+            // स्केल ठीक करें
+            applyScaling(id);
+        }
     }
 
-    function applyScaling() {
-        devices.forEach(dev => {
-            const frame = document.getElementById(`frame-${dev.id}`);
-            const wrapper = document.getElementById(`scale-${dev.id}`);
-            if (frame && wrapper) {
-                const scale = frame.clientWidth / 375;
-                wrapper.style.transform = `scale(${scale})`;
-                wrapper.style.height = (frame.clientHeight / scale) + 'px';
-            }
-        });
+    function loadUrlOnly(id) {
+        const urlInput = document.getElementById(`in-url-${id}`).value.trim();
+        let finalUrl = urlInput;
+        if(finalUrl && !/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+        
+        const dev = devices.find(d => d.id === id);
+        dev.url = finalUrl;
+        save();
+
+        const iframe = document.getElementById(`iframe-${id}`);
+        // सिर्फ इसी एक इफ़्रेम को लोड करें
+        iframe.src = finalUrl || 'about:blank';
+    }
+
+    function applyScaling(id) {
+        const dev = devices.find(d => d.id === id);
+        const frame = document.getElementById(`frame-${id}`);
+        const wrapper = document.getElementById(`scale-${id}`);
+        if (frame && wrapper) {
+            const scale = frame.clientWidth / 375;
+            wrapper.style.transform = `scale(${scale})`;
+            wrapper.style.height = (frame.clientHeight / scale) + 'px';
+        }
     }
 
     function addDevice() {
-        const newId = "dev" + Date.now();
-        devices.push({ id: newId, url: '', width: 300, height: 600 });
-        save(); render();
+        const newDev = { id: "dev_" + Date.now(), url: '', width: 300, height: 600 };
+        devices.push(newDev);
+        save();
+        createBoxInDOM(newDev);
+        renderControlPanel();
     }
 
-    function removeDevice(id) { devices = devices.filter(d => d.id !== id); save(); render(); }
-    function loadAll() { render(); }
-    function clearAll() { if(confirm("सब डेटा साफ़ करें?")) { localStorage.clear(); location.reload(); } }
+    function removeDevice(id) {
+        devices = devices.filter(d => d.id !== id);
+        save();
+        document.getElementById(`col-${id}`).remove();
+        renderControlPanel();
+    }
 
-    window.onload = render;
-    window.onresize = applyScaling;
-    setInterval(applyScaling, 2000);
+    function clearAllData() {
+        if(confirm("साफ़ करें?")) { localStorage.clear(); location.reload(); }
+    }
+
+    window.onload = initGrid;
+    window.onresize = () => devices.forEach(d => applyScaling(d.id));
 </script>
+
 </body>
 </html>
