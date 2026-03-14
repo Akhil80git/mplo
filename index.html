@@ -2,347 +2,188 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix Pro - Isolated Sessions</title>
+    <title>🚀 Matrix - Real Life Mobile Emulator</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #03050a; min-height: 100vh; padding: 15px; overflow: hidden; color: white; }
+        body { background: #05070a; min-height: 100vh; padding: 20px; overflow: hidden; color: white; }
         
-        .main-container { display: flex; height: 98vh; gap: 15px; }
+        .main-container { display: flex; height: 96vh; gap: 20px; }
         
-        .redmi-grid { 
-            display: flex; flex-wrap: wrap; gap: 15px; flex: 1; 
-            overflow-y: auto; align-content: flex-start; padding: 10px;
+        /* Grid Area */
+        .emulator-grid { 
+            display: flex; flex-wrap: wrap; gap: 30px; flex: 1; 
+            overflow-y: auto; align-content: flex-start; padding: 20px;
+            background: radial-gradient(circle at 50% 50%, #111 0%, #05070a 100%);
         }
 
-        .redmi-col { 
-            flex: 0 0 auto; 
-            transition: width 0.3s ease;
-        }
-        
-        .redmi-frame { 
-            background: #fff; border-radius: 20px; overflow: hidden; 
-            border: 2px solid #333; position: relative;
-            transition: height 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
+        .phone-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-        .device-badge {
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: #00ffcc;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 20px;
-            z-index: 10;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .iframe-wrapper {
-            width: 100%;
-            height: 100%;
+        /* REAL PHONE SHELL */
+        .phone-case { 
+            background: #000; 
+            border-radius: 45px; 
+            padding: 12px; 
+            border: 5px solid #222;
             position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 10px rgba(255,255,255,0.1);
         }
 
-        /* 
-          KEY FIX: har iframe ka alag name hoga
-          Aur hum ek proxy-wrapper page use karenge 
-          jo localStorage/sessionStorage isolate kare
-        */
+        /* Top Notch/Speaker */
+        .phone-case::before {
+            content: ""; position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 18px; background: #000; border-radius: 10px; z-index: 20;
+        }
+
+        /* Browser UI Simulator */
+        .browser-top {
+            height: 60px; background: #1a1a1a; width: 100%; 
+            border-top-left-radius: 35px; border-top-right-radius: 35px;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 5px 15px;
+            border-bottom: 1px solid #333;
+        }
+        .url-bar-sim { height: 24px; background: #333; border-radius: 12px; margin-bottom: 5px; width: 80%; margin-left: auto; margin-right: auto; }
+
+        .screen-container {
+            background: #fff; width: 100%; height: 100%;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
         iframe { 
-            border: none; 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
+            border: none; width: 100%; flex: 1; /* यह सिर्फ बची हुई जगह लेगा */
             background: white; 
         }
 
+        /* BOTTOM SYSTEM NAV (यह बटन को छुपायेगा) */
+        .browser-bottom {
+            height: 50px; background: #1a1a1a; width: 100%;
+            border-bottom-left-radius: 35px; border-bottom-right-radius: 35px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .nav-dash { width: 100px; height: 4px; background: #444; border-radius: 5px; }
+
         /* Control Panel */
         .control-panel { 
-            width: 320px; background: #0f111a; border-radius: 20px; 
+            width: 350px; background: #0f111a; border-radius: 25px; 
             padding: 20px; border: 1px solid #ff3b3b; overflow-y: auto;
-            flex-shrink: 0;
         }
 
-        .panel-header { 
-            color: #ff3b3b; text-align: center; font-size: 1.2rem; 
-            font-weight: 800; margin-bottom: 5px; border-bottom: 1px solid #222; 
-            padding-bottom: 10px; 
-        }
-        .panel-sub {
-            color: #555; font-size: 9px; text-align: center; margin-bottom: 15px;
-        }
+        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; text-shadow: 0 0 10px rgba(255,59,59,0.3); }
 
-        .info-box {
-            background: #0a1a0a;
-            border: 1px solid #00ffcc33;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 10px;
-            color: #00ffcc99;
-            line-height: 1.6;
-        }
-        .info-box strong { color: #00ffcc; display: block; margin-bottom: 4px; }
+        .url-row { background: #1a1d29; border-radius: 18px; padding: 18px; border: 1px solid #333; margin-bottom: 15px; }
+        .url-input { width: 100%; padding: 12px; background: #05070a; border: 1px solid #444; color: white; border-radius: 10px; font-size: 13px; margin-bottom: 12px; }
+        .dim-inputs { display: flex; gap: 10px; margin-bottom: 12px; }
+        .dim-inputs input { width: 50%; padding: 12px; background: #000; border: 1px solid #444; color: #00ffcc; border-radius: 10px; text-align: center; font-weight: bold; }
 
-        .url-row { 
-            background: #1a1d29; border-radius: 15px; padding: 12px; 
-            border: 1px solid #333; margin-bottom: 15px;
-        }
+        button { cursor: pointer; font-weight: bold; border-radius: 10px; border: none; transition: 0.3s; text-transform: uppercase; }
+        .apply-btn { background: #00ffcc; color: #000; padding: 12px; width: 100%; margin-bottom: 8px; font-size: 12px; }
+        .apply-btn:hover { background: #00d4aa; transform: scale(1.02); }
+        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 10px; }
+        .del-btn { flex: 1; background: #222; color: #ff4444; padding: 10px; }
+        .add-btn { width: 100%; padding: 16px; background: #ff3b3b; color: white; margin-bottom: 12px; box-shadow: 0 5px 15px rgba(255,59,59,0.2); }
 
-        .device-label { 
-            color: #00ffcc; font-size: 11px; font-weight: bold; 
-            margin-bottom: 4px; display: flex; justify-content: space-between;
-            align-items: center;
-        }
-        .session-id-badge {
-            background: #ff3b3b22;
-            color: #ff3b3b;
-            font-size: 8px;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-
-        .url-input { 
-            width: 100%; padding: 8px; background: #05070a; border: 1px solid #444; 
-            color: white; border-radius: 6px; font-size: 11px; margin-bottom: 10px;
-        }
-
-        .dim-inputs { display: flex; gap: 5px; margin-bottom: 10px; }
-        .dim-inputs input { 
-            width: 50%; padding: 8px; background: #000; border: 1px solid #444; 
-            color: #00ffcc; border-radius: 6px; font-size: 12px; text-align: center;
-        }
-
-        button { cursor: pointer; font-weight: bold; border-radius: 8px; border: none; transition: 0.2s; font-size: 11px; }
-        
-        .apply-btn { background: #00ffcc; color: #000; padding: 10px; width: 100%; margin-bottom: 8px; text-transform: uppercase; }
-        .apply-btn:hover { background: #00d4aa; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
-
-        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 8px; }
-        .load-btn:hover { background: #cc2222; }
-        .del-btn { flex: 1; background: #333; color: #ff4444; padding: 8px; }
-        .del-btn:hover { background: #444; }
-
-        .add-btn { 
-            width: 100%; padding: 15px; background: #ff3b3b; color: white; 
-            font-size: 13px; margin-bottom: 10px; text-transform: uppercase;
-        }
-        .add-btn:hover { background: #cc2222; }
-
-        .clear-btn-link {
-            width: 100%; background: none; border: none; color: #444; 
-            font-size: 10px; cursor: pointer; margin-top: 10px;
-            text-decoration: underline;
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #ff3b3b; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="redmi-grid" id="redmiGrid"></div>
+    <div class="emulator-grid" id="redmiGrid"></div>
     
     <div class="control-panel">
-        <h1 class="panel-header">🚀 MATRIX V8 PRO</h1>
-        <p class="panel-sub">Isolated Session Edition</p>
-
-        <div class="info-box">
-            <strong>🔐 Session Isolation Kaise Kaam Karta Hai?</strong>
-            Har box ka alag <b>Session ID</b> hota hai. Jab tu kisi site pe login karta hai, 
-            uski cookies/session sirf uss box mein rehti hain. 
-            Dusre box mein same site khulegi lekin fresh — alag account login kar sakta hai!
-            <br><br>
-            <b>Note:</b> Yeh browser ke <code>credentialless</code> 
-            + <code>iframe name partitioning</code> pe based hai.
-        </div>
-        
+        <h1 class="panel-header">⚡ MATRIX ELITE</h1>
         <div id="urlList"></div>
-        
         <button class="add-btn" onclick="addDevice()">➕ ADD NEW DEVICE</button>
-        <button class="clear-btn-link" onclick="clearAllData()">Reset All Data</button>
+        <button onclick="localStorage.clear(); location.reload();" style="width:100%; background:none; color:#444; font-size:10px;">Reset System Data</button>
     </div>
 </div>
 
 <script>
-    /*
-     * ISOLATION STRATEGY:
-     * ==================
-     * 
-     * Browser mein true iframe isolation ke liye:
-     * 1. `credentialless` attribute: Chrome 98+ mein cookies share nahi hoti cross-origin ke liye
-     * 2. Unique iframe `name`: Alag browsing context banta hai (sessionStorage alag rehta hai!)
-     * 3. Storage Key Prefixing: Hum apni app ka localStorage prefix karte hain (yeh site ki cookies ko affect nahi karta)
-     * 
-     * IMPORTANT: Same-origin sites ke liye browser cookies naturally share hoti hain
-     * unless site SameSite=None use kare. Yeh limitation browser level hai.
-     * 
-     * Best isolation browser extensions (Multi-Account Containers) deti hain,
-     * lekin hum javascript se maximum isolation achieve kar rahe hain.
-     * 
-     * sessionStorage → alag hoti hai per-iframe (name attribute se)
-     * localStorage → same origin pe share hoti hai (limitation)
-     * Cookies (SameSite=Lax/Strict) → share hoti hain same origin ke liye
-     * Cookies (credentialless) → cross-origin ke liye block hoti hain
-     */
-
-    const STORAGE_KEY = 'matrix_v8_isolated';
-    
-    function generateSessionId() {
-        return 'sess_' + Math.random().toString(36).substr(2, 8).toUpperCase();
-    }
-
+    const STORAGE_KEY = 'matrix_elite_v9';
     let devices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-        { id: "dev_" + Date.now(), sessionId: generateSessionId(), url: '', width: 350, height: 650 }
+        { id: "dev_1", url: 'https://imagex-ten.vercel.app/', width: 375, height: 750 }
     ];
 
-    function save() { 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); 
-    }
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
 
     function initGrid() {
         const grid = document.getElementById('redmiGrid');
         grid.innerHTML = '';
-        devices.forEach(dev => createBoxInDOM(dev));
-        renderControlPanel();
+        devices.forEach(dev => createDevice(dev));
+        renderList();
     }
 
-    function createBoxInDOM(dev) {
+    function createDevice(dev) {
         const grid = document.getElementById('redmiGrid');
-        const col = document.createElement('div');
-        col.className = 'redmi-col';
-        col.id = `col-${dev.id}`;
-        col.style.width = dev.width + 'px';
+        const wrap = document.createElement('div');
+        wrap.className = 'phone-wrapper';
+        wrap.id = `wrap-${dev.id}`;
         
-        /*
-         * ISOLATION MAGIC:
-         * - name="${dev.sessionId}" → unique browsing context (sessionStorage alag!)
-         * - credentialless → cross-origin cookies block (Chrome 98+)
-         * - sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-modals" 
-         *   → minimal permissions, alag execution context
-         *   NOTE: allow-same-origin zaroori hai warna site kaam nahi karegi
-         *         but isse cookies isolation partially break hoti hai same-origin ke liye
-         *         Cross-origin sites ke liye yeh perfectly isolated hain!
-         */
-        col.innerHTML = `
-            <div class="redmi-frame" id="frame-${dev.id}" style="height: ${dev.height}px;">
-                <div class="device-badge">📱 Box #${devices.indexOf(dev) + 1} | ${dev.sessionId}</div>
-                <iframe 
-                    id="iframe-${dev.id}" 
-                    name="${dev.sessionId}"
-                    src="${dev.url || 'about:blank'}"
-                    credentialless
-                    allow="clipboard-write; camera; microphone; popups; popups-to-escape-sandbox"
-                    sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals allow-top-navigation"
-                    referrerpolicy="no-referrer"
-                ></iframe>
+        wrap.innerHTML = `
+            <div class="phone-case" style="width: ${dev.width + 24}px; height: ${dev.height + 24}px;">
+                <div class="screen-container">
+                    <div class="browser-top"><div class="url-bar-sim"></div></div>
+                    <iframe id="iframe-${dev.id}" src="${dev.url || 'about:blank'}"></iframe>
+                    <div class="browser-bottom"><div class="nav-dash"></div></div>
+                </div>
             </div>
+            <span style="font-size:11px; color:#666; font-weight:bold;">REAL VIEWPORT: ${dev.width}x${dev.height - 110}</span>
         `;
-        grid.appendChild(col);
+        grid.appendChild(wrap);
     }
 
-    function renderControlPanel() {
+    function renderList() {
         const list = document.getElementById('urlList');
         list.innerHTML = '';
-        
-        devices.forEach((dev, index) => {
+        devices.forEach(dev => {
             const row = document.createElement('div');
             row.className = 'url-row';
             row.innerHTML = `
-                <div class="device-label">
-                    <span>📱 DEVICE #${index + 1}</span>
-                    <span class="session-id-badge">${dev.sessionId}</span>
-                </div>
-                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ पेस्ट करें..." value="${dev.url}">
-                
+                <input type="text" class="url-input" id="in-url-${dev.id}" value="${dev.url}">
                 <div class="dim-inputs">
-                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="Width">
-                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="Height">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="W">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="H">
                 </div>
-
-                <button class="apply-btn" onclick="updateDeviceConfig('${dev.id}')">⚙️ Apply Size</button>
-                <div style="display: flex; gap: 5px;">
-                    <button class="load-btn" onclick="loadUrlOnly('${dev.id}')">⚡ Load URL</button>
-                    <button class="del-btn" onclick="removeDevice('${dev.id}')">🗑️ Del</button>
+                <button class="apply-btn" onclick="updateDevice('${dev.id}')">Apply Real Behavior</button>
+                <div style="display:flex; gap:5px;">
+                    <button class="load-btn" onclick="loadUrl('${dev.id}')">Refresh</button>
+                    <button class="del-btn" onclick="removeDevice('${dev.id}')">Del</button>
                 </div>
             `;
             list.appendChild(row);
         });
     }
 
-    function updateDeviceConfig(id) {
-        const newW = parseInt(document.getElementById(`w-${id}`).value) || 350;
-        const newH = parseInt(document.getElementById(`h-${id}`).value) || 650;
-        
+    function updateDevice(id) {
+        const w = parseInt(document.getElementById(`w-${id}`).value);
+        const h = parseInt(document.getElementById(`h-${id}`).value);
         const dev = devices.find(d => d.id === id);
-        if(dev) {
-            dev.width = newW;
-            dev.height = newH;
-            save();
-
-            const col = document.getElementById(`col-${id}`);
-            const frame = document.getElementById(`frame-${id}`);
-            
-            if(col) col.style.width = newW + 'px';
-            if(frame) frame.style.height = newH + 'px';
-        }
+        dev.width = w; dev.height = h;
+        save();
+        initGrid();
     }
 
-    function loadUrlOnly(id) {
-        const urlInput = document.getElementById(`in-url-${id}`).value.trim();
-        let finalUrl = urlInput;
-        if(finalUrl && !/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
-        
+    function loadUrl(id) {
+        const url = document.getElementById(`in-url-${id}`).value.trim();
+        const finalUrl = url.startsWith('http') ? url : 'https://' + url;
         const dev = devices.find(d => d.id === id);
-        if(dev) {
-            dev.url = finalUrl;
-            save();
-        }
-
-        const iframe = document.getElementById(`iframe-${id}`);
-        if(iframe) iframe.src = finalUrl || 'about:blank';
+        dev.url = finalUrl;
+        save();
+        document.getElementById(`iframe-${id}`).src = finalUrl;
     }
 
     function addDevice() {
-        const newDev = { 
-            id: "dev_" + Date.now(), 
-            sessionId: generateSessionId(),  // ← Naya unique session ID!
-            url: '', 
-            width: 350, 
-            height: 650 
-        };
-        devices.push(newDev);
-        save();
-        createBoxInDOM(newDev);
-        renderControlPanel();
+        devices.push({ id: "dev_" + Date.now(), url: '', width: 375, height: 750 });
+        save(); initGrid();
     }
 
     function removeDevice(id) {
-        if(confirm("Delete this box?")) {
-            devices = devices.filter(d => d.id !== id);
-            save();
-            const col = document.getElementById(`col-${id}`);
-            if(col) col.remove();
-            renderControlPanel();
-        }
-    }
-
-    function clearAllData() {
-        if(confirm("Sab kuch reset karna hai? Sabhi sessions clear ho jayenge.")) { 
-            localStorage.removeItem(STORAGE_KEY); 
-            location.reload(); 
-        }
+        devices = devices.filter(d => d.id !== id);
+        save(); initGrid();
     }
 
     window.onload = initGrid;
 </script>
-
 </body>
 </html>
