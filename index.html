@@ -2,107 +2,102 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix - Real Life Mobile Emulator</title>
+    <title>🚀 Matrix Pro Max - Fixed View</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #05070a; min-height: 100vh; padding: 20px; overflow: hidden; color: white; }
+        body { background: #03050a; min-height: 100vh; padding: 15px; overflow: hidden; color: white; }
         
-        .main-container { display: flex; height: 96vh; gap: 20px; }
+        .main-container { display: flex; height: 98vh; gap: 15px; }
         
         /* Grid Area */
-        .emulator-grid { 
-            display: flex; flex-wrap: wrap; gap: 30px; flex: 1; 
-            overflow-y: auto; align-content: flex-start; padding: 20px;
-            background: radial-gradient(circle at 50% 50%, #111 0%, #05070a 100%);
+        .redmi-grid { 
+            display: flex; flex-wrap: wrap; gap: 15px; flex: 1; 
+            overflow-y: auto; align-content: flex-start; padding: 10px;
         }
 
-        .phone-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-
-        /* REAL PHONE SHELL */
-        .phone-case { 
-            background: #000; 
-            border-radius: 45px; 
-            padding: 12px; 
-            border: 5px solid #222;
-            position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 10px rgba(255,255,255,0.1);
+        .redmi-col { 
+            flex: 0 0 auto; 
+            transition: width 0.3s ease;
+        }
+        
+        .redmi-frame { 
+            background: #fff; border-radius: 20px; overflow: hidden; 
+            border: 2px solid #333; position: relative;
+            transition: height 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        /* Top Notch/Speaker */
-        .phone-case::before {
-            content: ""; position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 18px; background: #000; border-radius: 10px; z-index: 20;
-        }
-
-        /* Browser UI Simulator */
-        .browser-top {
-            height: 60px; background: #1a1a1a; width: 100%; 
-            border-top-left-radius: 35px; border-top-right-radius: 35px;
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 5px 15px;
-            border-bottom: 1px solid #333;
-        }
-        .url-bar-sim { height: 24px; background: #333; border-radius: 12px; margin-bottom: 5px; width: 80%; margin-left: auto; margin-right: auto; }
-
-        .screen-container {
-            background: #fff; width: 100%; height: 100%;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
+        /* Iframe takes full space of the box */
         iframe { 
-            border: none; width: 100%; flex: 1; /* यह सिर्फ बची हुई जगह लेगा */
+            border: none; 
+            width: 100%; 
+            height: 100%; 
+            display: block; 
             background: white; 
         }
 
-        /* BOTTOM SYSTEM NAV (यह बटन को छुपायेगा) */
-        .browser-bottom {
-            height: 50px; background: #1a1a1a; width: 100%;
-            border-bottom-left-radius: 35px; border-bottom-right-radius: 35px;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .nav-dash { width: 100px; height: 4px; background: #444; border-radius: 5px; }
-
         /* Control Panel */
         .control-panel { 
-            width: 350px; background: #0f111a; border-radius: 25px; 
+            width: 320px; background: #0f111a; border-radius: 20px; 
             padding: 20px; border: 1px solid #ff3b3b; overflow-y: auto;
         }
 
-        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; text-shadow: 0 0 10px rgba(255,59,59,0.3); }
+        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
-        .url-row { background: #1a1d29; border-radius: 18px; padding: 18px; border: 1px solid #333; margin-bottom: 15px; }
-        .url-input { width: 100%; padding: 12px; background: #05070a; border: 1px solid #444; color: white; border-radius: 10px; font-size: 13px; margin-bottom: 12px; }
-        .dim-inputs { display: flex; gap: 10px; margin-bottom: 12px; }
-        .dim-inputs input { width: 50%; padding: 12px; background: #000; border: 1px solid #444; color: #00ffcc; border-radius: 10px; text-align: center; font-weight: bold; }
+        .url-row { 
+            background: #1a1d29; border-radius: 15px; padding: 12px; 
+            border: 1px solid #333; margin-bottom: 15px;
+        }
 
-        button { cursor: pointer; font-weight: bold; border-radius: 10px; border: none; transition: 0.3s; text-transform: uppercase; }
-        .apply-btn { background: #00ffcc; color: #000; padding: 12px; width: 100%; margin-bottom: 8px; font-size: 12px; }
-        .apply-btn:hover { background: #00d4aa; transform: scale(1.02); }
-        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 10px; }
-        .del-btn { flex: 1; background: #222; color: #ff4444; padding: 10px; }
-        .add-btn { width: 100%; padding: 16px; background: #ff3b3b; color: white; margin-bottom: 12px; box-shadow: 0 5px 15px rgba(255,59,59,0.2); }
+        .device-label { color: #00ffcc; font-size: 11px; font-weight: bold; margin-bottom: 8px; display: block; }
 
-        ::-webkit-scrollbar { width: 6px; }
+        .url-input { 
+            width: 100%; padding: 8px; background: #05070a; border: 1px solid #444; 
+            color: white; border-radius: 6px; font-size: 11px; margin-bottom: 10px;
+        }
+
+        .dim-inputs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .dim-inputs input { 
+            width: 50%; padding: 8px; background: #000; border: 1px solid #444; 
+            color: #00ffcc; border-radius: 6px; font-size: 12px; text-align: center;
+        }
+
+        button { cursor: pointer; font-weight: bold; border-radius: 8px; border: none; transition: 0.2s; font-size: 11px; }
+        
+        .apply-btn { background: #00ffcc; color: #000; padding: 10px; width: 100%; margin-bottom: 8px; text-transform: uppercase; }
+        .apply-btn:hover { background: #00d4aa; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3); }
+
+        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 8px; }
+        .del-btn { flex: 1; background: #333; color: #ff4444; padding: 8px; }
+
+        .add-btn { 
+            width: 100%; padding: 15px; background: #ff3b3b; color: white; 
+            font-size: 13px; margin-bottom: 10px; text-transform: uppercase;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #ff3b3b; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="emulator-grid" id="redmiGrid"></div>
+    <div class="redmi-grid" id="redmiGrid"></div>
     
     <div class="control-panel">
-        <h1 class="panel-header">⚡ MATRIX ELITE</h1>
+        <h1 class="panel-header">🚀 MATRIX V7 PRO</h1>
+        
         <div id="urlList"></div>
+        
         <button class="add-btn" onclick="addDevice()">➕ ADD NEW DEVICE</button>
-        <button onclick="localStorage.clear(); location.reload();" style="width:100%; background:none; color:#444; font-size:10px;">Reset System Data</button>
+        <button onclick="clearAllData()" style="width: 100%; background: none; border: none; color: #444; font-size: 10px; cursor: pointer; margin-top: 10px;">Reset All Data</button>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'matrix_elite_v9';
+    const STORAGE_KEY = 'matrix_fixed_v7';
     let devices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-        { id: "dev_1", url: 'https://imagex-ten.vercel.app/', width: 375, height: 750 }
+        { id: "dev_" + Date.now(), url: '', width: 350, height: 650 }
     ];
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
@@ -110,80 +105,105 @@
     function initGrid() {
         const grid = document.getElementById('redmiGrid');
         grid.innerHTML = '';
-        devices.forEach(dev => createDevice(dev));
-        renderList();
+        devices.forEach(dev => createBoxInDOM(dev));
+        renderControlPanel();
     }
 
-    function createDevice(dev) {
+    function createBoxInDOM(dev) {
         const grid = document.getElementById('redmiGrid');
-        const wrap = document.createElement('div');
-        wrap.className = 'phone-wrapper';
-        wrap.id = `wrap-${dev.id}`;
+        const col = document.createElement('div');
+        col.className = 'redmi-col';
+        col.id = `col-${dev.id}`;
+        col.style.width = dev.width + 'px';
         
-        wrap.innerHTML = `
-            <div class="phone-case" style="width: ${dev.width + 24}px; height: ${dev.height + 24}px;">
-                <div class="screen-container">
-                    <div class="browser-top"><div class="url-bar-sim"></div></div>
-                    <iframe id="iframe-${dev.id}" src="${dev.url || 'about:blank'}"></iframe>
-                    <div class="browser-bottom"><div class="nav-dash"></div></div>
-                </div>
+        col.innerHTML = `
+            <div class="redmi-frame" id="frame-${dev.id}" style="height: ${dev.height}px;">
+                <iframe id="iframe-${dev.id}" src="${dev.url || 'about:blank'}" allow="clipboard-write"></iframe>
             </div>
-            <span style="font-size:11px; color:#666; font-weight:bold;">REAL VIEWPORT: ${dev.width}x${dev.height - 110}</span>
         `;
-        grid.appendChild(wrap);
+        grid.appendChild(col);
     }
 
-    function renderList() {
+    function renderControlPanel() {
         const list = document.getElementById('urlList');
         list.innerHTML = '';
-        devices.forEach(dev => {
+        
+        devices.forEach((dev, index) => {
             const row = document.createElement('div');
             row.className = 'url-row';
             row.innerHTML = `
-                <input type="text" class="url-input" id="in-url-${dev.id}" value="${dev.url}">
+                <span class="device-label">📱 DEVICE #${index + 1}</span>
+                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ पेस्ट करें..." value="${dev.url}">
+                
                 <div class="dim-inputs">
-                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="W">
-                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="H">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="Width">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="Height">
                 </div>
-                <button class="apply-btn" onclick="updateDevice('${dev.id}')">Apply Real Behavior</button>
-                <div style="display:flex; gap:5px;">
-                    <button class="load-btn" onclick="loadUrl('${dev.id}')">Refresh</button>
-                    <button class="del-btn" onclick="removeDevice('${dev.id}')">Del</button>
+
+                <button class="apply-btn" onclick="updateDeviceConfig('${dev.id}')">Apply Settings</button>
+                <div style="display: flex; gap: 5px;">
+                    <button class="load-btn" onclick="loadUrlOnly('${dev.id}')">⚡ Load Web</button>
+                    <button class="del-btn" onclick="removeDevice('${dev.id}')">Delete</button>
                 </div>
             `;
             list.appendChild(row);
         });
     }
 
-    function updateDevice(id) {
-        const w = parseInt(document.getElementById(`w-${id}`).value);
-        const h = parseInt(document.getElementById(`h-${id}`).value);
+    function updateDeviceConfig(id) {
+        const newW = document.getElementById(`w-${id}`).value;
+        const newH = document.getElementById(`h-${id}`).value;
+        
         const dev = devices.find(d => d.id === id);
-        dev.width = w; dev.height = h;
-        save();
-        initGrid();
+        if(dev) {
+            dev.width = parseInt(newW);
+            dev.height = parseInt(newH);
+            save();
+
+            const col = document.getElementById(`col-${id}`);
+            const frame = document.getElementById(`frame-${id}`);
+            
+            if(col) col.style.width = newW + 'px';
+            if(frame) frame.style.height = newH + 'px';
+        }
     }
 
-    function loadUrl(id) {
-        const url = document.getElementById(`in-url-${id}`).value.trim();
-        const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+    function loadUrlOnly(id) {
+        const urlInput = document.getElementById(`in-url-${id}`).value.trim();
+        let finalUrl = urlInput;
+        if(finalUrl && !/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+        
         const dev = devices.find(d => d.id === id);
         dev.url = finalUrl;
         save();
-        document.getElementById(`iframe-${id}`).src = finalUrl;
+
+        const iframe = document.getElementById(`iframe-${id}`);
+        iframe.src = finalUrl || 'about:blank';
     }
 
     function addDevice() {
-        devices.push({ id: "dev_" + Date.now(), url: '', width: 375, height: 750 });
-        save(); initGrid();
+        const newDev = { id: "dev_" + Date.now(), url: '', width: 350, height: 650 };
+        devices.push(newDev);
+        save();
+        createBoxInDOM(newDev);
+        renderControlPanel();
     }
 
     function removeDevice(id) {
-        devices = devices.filter(d => d.id !== id);
-        save(); initGrid();
+        if(confirm("Delete this box?")) {
+            devices = devices.filter(d => d.id !== id);
+            save();
+            document.getElementById(`col-${id}`).remove();
+            renderControlPanel();
+        }
+    }
+
+    function clearAllData() {
+        if(confirm("Clear everything?")) { localStorage.clear(); location.reload(); }
     }
 
     window.onload = initGrid;
 </script>
+
 </body>
 </html>
