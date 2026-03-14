@@ -2,149 +2,198 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix V10 - Strict Mobile Mask</title>
+    <title>🚀 Matrix Pro Max - True Mobile Emulator</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #03050a; height: 100vh; padding: 15px; overflow: hidden; color: white; }
+        body { background: #03050a; min-height: 100vh; padding: 15px; overflow: hidden; color: white; }
         
-        .main-container { display: flex; height: 95vh; gap: 20px; }
+        .main-container { display: flex; height: 98vh; gap: 15px; }
         
-        .emulator-grid { 
-            display: flex; flex-wrap: wrap; gap: 30px; flex: 1; 
+        /* Grid Area */
+        .redmi-grid { 
+            display: flex; flex-wrap: wrap; gap: 20px; flex: 1; 
             overflow-y: auto; align-content: flex-start; padding: 20px;
+            background: radial-gradient(circle at center, #111 0%, #03050a 100%);
         }
 
-        /* असली मोबाइल का ढांचा */
-        .phone-shell { 
-            background: #000; border-radius: 40px; padding: 10px; 
-            border: 4px solid #222; position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
-            overflow: hidden; /* ताकि कंटेंट बाहर न निकले */
+        .device-container { 
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            transition: all 0.3s ease;
         }
 
-        /* TOP BROWSER BAR (Notch के साथ) */
-        .browser-header {
-            height: 55px; background: #1a1a1a; width: 100%;
-            border-top-left-radius: 30px; border-top-right-radius: 30px;
-            position: relative; z-index: 10; border-bottom: 1px solid #333;
-        }
-        .notch {
-            width: 80px; height: 18px; background: #000; margin: 0 auto;
-            border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+        /* Real Mobile Border Logic */
+        .mobile-frame { 
+            background: #000; border-radius: 35px; 
+            padding: 12px; /* This simulates the Phone Bezel */
+            border: 4px solid #333;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
 
-        /* IFRAME CONTAINER */
-        .viewport {
-            width: 100%; height: 100%; background: #fff;
-            position: relative; overflow: hidden;
+        /* Screen Area */
+        .screen {
+            background: #fff;
+            width: 100%;
+            height: 100%;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
         }
+
+        /* Bottom Navigation Bar Simulation (Safe Area) */
+        .safe-area-bottom {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: 25px; background: rgba(0,0,0,0.1);
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none; z-index: 10;
+        }
+        .home-bar { width: 40%; height: 4px; background: #555; border-radius: 10px; }
 
         iframe { 
-            border: none; width: 100%; height: 100%; 
-            display: block; background: white;
+            border: none; width: 100%; height: 100%; display: block; 
+            background: white; 
         }
-
-        /* STRICT BOTTOM NAV (यह कंटेंट को कवर करेगा) */
-        .browser-footer {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            height: 65px; /* असली मोबाइल नेविगेशन की हाइट */
-            background: #1a1a1a; /* सॉलिड कलर ताकि पीछे का बटन छुप जाए */
-            z-index: 100; /* सबसे ऊपर */
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            border-top: 1px solid #333;
-            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
-        }
-        .home-indicator { width: 100px; height: 4px; background: #555; border-radius: 10px; margin-top: 15px; }
 
         /* Control Panel */
         .control-panel { 
-            width: 350px; background: #0f111a; border-radius: 25px; 
-            padding: 20px; border: 1px solid #ff3b3b;
+            width: 340px; background: #0f111a; border-radius: 25px; 
+            padding: 20px; border: 1px solid #ff3b3b; overflow-y: auto;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
-        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.3rem; margin-bottom: 20px; font-weight: 800; }
-        .url-row { background: #1a1d29; border-radius: 15px; padding: 15px; border: 1px solid #333; margin-bottom: 10px; }
-        .url-input { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: white; border-radius: 8px; font-size: 12px; margin-bottom: 10px; }
-        .dim-inputs { display: flex; gap: 8px; }
+
+        .panel-header { color: #ff3b3b; text-align: center; font-size: 1.4rem; font-weight: 800; margin-bottom: 20px; }
+
+        .url-row { background: #1a1d29; border-radius: 15px; padding: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        .url-input { width: 100%; padding: 10px; background: #05070a; border: 1px solid #444; color: white; border-radius: 8px; font-size: 12px; margin-bottom: 10px; }
+        .dim-inputs { display: flex; gap: 8px; margin-bottom: 10px; }
         .dim-inputs input { width: 50%; padding: 10px; background: #000; border: 1px solid #444; color: #00ffcc; border-radius: 8px; text-align: center; }
-        
-        button { cursor: pointer; border: none; transition: 0.2s; font-weight: bold; border-radius: 8px; }
-        .apply-btn { background: #00ffcc; color: #000; width: 100%; padding: 12px; margin-top: 10px; font-size: 12px; }
-        .add-btn { background: #ff3b3b; color: white; width: 100%; padding: 15px; margin-top: 10px; }
-        
+
+        button { cursor: pointer; font-weight: bold; border-radius: 8px; border: none; transition: 0.2s; }
+        .apply-btn { background: #00ffcc; color: #000; padding: 12px; width: 100%; margin-bottom: 10px; text-transform: uppercase; font-size: 12px; }
+        .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 10px; font-size: 11px; }
+        .del-btn { flex: 1; background: #222; color: #ff4444; padding: 10px; }
+        .add-btn { width: 100%; padding: 15px; background: #ff3b3b; color: white; margin-bottom: 10px; }
+
         ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #ff3b3b; }
+        ::-webkit-scrollbar-thumb { background: #ff3b3b; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
-    <div class="emulator-grid" id="grid"></div>
+    <div class="redmi-grid" id="redmiGrid"></div>
     
     <div class="control-panel">
-        <h1 class="panel-header">⚡ MATRIX STRICT V10</h1>
-        <div id="list"></div>
-        <button class="add-btn" onclick="add()">➕ ADD NEW DEVICE</button>
+        <h1 class="panel-header">🚀 TRUE EMULATOR</h1>
+        <div id="urlList"></div>
+        <button class="add-btn" onclick="addDevice()">➕ ADD NEW DEVICE</button>
+        <button onclick="clearAllData()" style="width: 100%; background: none; color: #444; font-size: 10px;">Wipe Local Storage</button>
     </div>
 </div>
 
 <script>
-    let devices = JSON.parse(localStorage.getItem('matrix_v10')) || [
-        { id: Date.now(), url: 'https://imagex-ten.vercel.app/', w: 360, h: 740 }
+    const STORAGE_KEY = 'matrix_true_emulator_v8';
+    let devices = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+        { id: "dev_1", url: 'https://imagex-ten.vercel.app/', width: 360, height: 740 }
     ];
 
-    function render() {
-        localStorage.setItem('matrix_v10', JSON.stringify(devices));
-        const grid = document.getElementById('grid');
-        const list = document.getElementById('list');
-        grid.innerHTML = ''; list.innerHTML = '';
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
 
-        devices.forEach(d => {
-            // Create Device
-            const shell = document.createElement('div');
-            shell.className = 'phone-shell';
-            shell.style.width = (d.w + 20) + 'px';
-            shell.style.height = (d.h + 20) + 'px';
-            shell.innerHTML = `
-                <div class="browser-header"><div class="notch"></div></div>
-                <div class="viewport">
-                    <iframe src="${d.url}"></iframe>
-                    <div class="browser-footer">
-                        <div style="display:flex; gap:20px; opacity:0.5; font-size:10px;"><span>◄</span><span>●</span><span>■</span></div>
-                        <div class="home-indicator"></div>
-                    </div>
+    function initGrid() {
+        const grid = document.getElementById('redmiGrid');
+        grid.innerHTML = '';
+        devices.forEach(dev => createDeviceInDOM(dev));
+        renderControlPanel();
+    }
+
+    function createDeviceInDOM(dev) {
+        const grid = document.getElementById('redmiGrid');
+        const container = document.createElement('div');
+        container.className = 'device-container';
+        container.id = `cont-${dev.id}`;
+        
+        container.innerHTML = `
+            <div class="mobile-frame" style="width: ${dev.width + 24}px; height: ${dev.height + 24}px;">
+                <div class="screen">
+                    <iframe id="iframe-${dev.id}" src="${dev.url || 'about:blank'}"></iframe>
+                    <div class="safe-area-bottom"><div class="home-bar"></div></div>
                 </div>
-            `;
-            grid.appendChild(shell);
+            </div>
+            <span style="font-size:10px; color:#555;">${dev.width} x ${dev.height} (Viewport)</span>
+        `;
+        grid.appendChild(container);
+    }
 
-            // Create Controls
+    function renderControlPanel() {
+        const list = document.getElementById('urlList');
+        list.innerHTML = '';
+        devices.forEach((dev, index) => {
             const row = document.createElement('div');
             row.className = 'url-row';
             row.innerHTML = `
-                <input class="url-input" id="url-${d.id}" value="${d.url}">
+                <div style="color:#00ffcc; font-size:11px; margin-bottom:8px; font-weight:bold;">DEVICE #${index + 1}</div>
+                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ डालें" value="${dev.url}">
                 <div class="dim-inputs">
-                    <input type="number" id="w-${d.id}" value="${d.w}">
-                    <input type="number" id="h-${d.id}" value="${d.h}">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" title="Width">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" title="Height">
                 </div>
-                <button class="apply-btn" onclick="update(${d.id})">Update & Kill Visibility</button>
+                <button class="apply-btn" onclick="updateDevice('${dev.id}')">Apply & Sync Viewport</button>
+                <div style="display: flex; gap: 5px;">
+                    <button class="load-btn" onclick="loadUrl('${dev.id}')">⚡ Refresh Web</button>
+                    <button class="del-btn" onclick="removeDevice('${dev.id}')">Del</button>
+                </div>
             `;
             list.appendChild(row);
         });
     }
 
-    function update(id) {
-        const d = devices.find(x => x.id === id);
-        d.url = document.getElementById(`url-${id}`).value;
-        d.w = parseInt(document.getElementById(`w-${id}`).value);
-        d.h = parseInt(document.getElementById(`h-${id}`).value);
-        render();
+    function updateDevice(id) {
+        const newW = parseInt(document.getElementById(`w-${id}`).value);
+        const newH = parseInt(document.getElementById(`h-${id}`).value);
+        
+        const dev = devices.find(d => d.id === id);
+        if(dev) {
+            dev.width = newW;
+            dev.height = newH;
+            save();
+
+            const container = document.getElementById(`cont-${id}`);
+            const frame = container.querySelector('.mobile-frame');
+            frame.style.width = (newW + 24) + 'px';
+            frame.style.height = (newH + 24) + 'px';
+            container.querySelector('span').innerText = `${newW} x ${newH} (Viewport)`;
+        }
     }
 
-    function add() {
-        devices.push({ id: Date.now(), url: '', w: 360, h: 740 });
-        render();
+    function loadUrl(id) {
+        const url = document.getElementById(`in-url-${id}`).value.trim();
+        const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+        const dev = devices.find(d => d.id === id);
+        dev.url = finalUrl;
+        save();
+        document.getElementById(`iframe-${id}`).src = finalUrl;
     }
 
-    window.onload = render;
+    function addDevice() {
+        const newDev = { id: "dev_" + Date.now(), url: '', width: 360, height: 740 };
+        devices.push(newDev);
+        save();
+        createDeviceInDOM(newDev);
+        renderControlPanel();
+    }
+
+    function removeDevice(id) {
+        devices = devices.filter(d => d.id !== id);
+        save();
+        document.getElementById(`cont-${id}`).remove();
+        renderControlPanel();
+    }
+
+    function clearAllData() { if(confirm("Clear?")) { localStorage.clear(); location.reload(); } }
+
+    window.onload = initGrid;
 </script>
+
 </body>
 </html>
