@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>🚀 Matrix Pro Max - Dynamic View</title>
+    <title>🚀 Matrix Pro Max - Refresh Enabled</title>
     <style>
         :root {
             --bg-color: #03050a;
@@ -13,7 +13,6 @@
             --input-bg: #05070a;
         }
 
-        /* Light Mode Variables */
         body.light-mode {
             --bg-color: #f0f2f5;
             --panel-bg: #ffffff;
@@ -28,24 +27,19 @@
         
         .main-container { display: flex; height: 98vh; gap: 0; }
         
-        /* Grid Area */
         .redmi-grid { 
             display: flex; flex-wrap: wrap; gap: 15px; flex: 1; 
             overflow-y: auto; align-content: flex-start; padding: 10px;
         }
 
-        /* Resizable Sidebar Logic */
         .control-panel { 
-            width: 320px; /* Default width */
-            min-width: 200px;
-            max-width: 600px;
+            width: 320px; min-width: 200px; max-width: 600px;
             background: var(--panel-bg); border-radius: 20px; 
             padding: 20px; border: 1px solid var(--border-color); 
             overflow-y: auto; position: relative;
             display: flex; flex-direction: column;
         }
 
-        /* Resize Handle */
         .resizer {
             width: 10px; cursor: ew-resize; height: 100%;
             position: absolute; left: 0; top: 0; background: transparent;
@@ -54,7 +48,6 @@
 
         .panel-header { color: #ff3b3b; text-align: center; font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 10px; }
 
-        /* Toggle Button Styling */
         .theme-toggle {
             background: #333; color: white; border: none; padding: 5px 10px; 
             border-radius: 20px; cursor: pointer; font-size: 10px; margin-bottom: 15px; align-self: center;
@@ -88,8 +81,12 @@
 
         button { cursor: pointer; font-weight: bold; border-radius: 8px; border: none; transition: 0.2s; font-size: 11px; }
         .apply-btn { background: #00ffcc; color: #000; padding: 10px; width: 100%; margin-bottom: 8px; text-transform: uppercase; }
+        
+        .action-group { display: flex; gap: 5px; flex-wrap: wrap; }
         .load-btn { flex: 2; background: #ff3b3b; color: white; padding: 8px; }
+        .refresh-btn { flex: 1.2; background: #2ecc71; color: white; padding: 8px; }
         .del-btn { flex: 1; background: #333; color: #ff4444; padding: 8px; }
+
         .add-btn { width: 100%; padding: 15px; background: #ff3b3b; color: white; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; }
 
         ::-webkit-scrollbar { width: 4px; }
@@ -103,7 +100,6 @@
     
     <div class="control-panel" id="sidePanel">
         <div class="resizer" id="dragHandle"></div>
-
         <h1 class="panel-header">🚀 MATRIX V7 PRO</h1>
         
         <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌓 SWITCH LIGHT MODE</button>
@@ -121,7 +117,6 @@
         { id: "dev_" + Date.now(), url: '', width: 350, height: 650 }
     ];
 
-    // Theme Logic
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
@@ -129,16 +124,18 @@
         localStorage.setItem('matrix_theme', isLight ? 'light' : 'dark');
     }
 
-    // Sidebar Resize Logic
+    // Resizer logic
     const panel = document.getElementById('sidePanel');
     const handle = document.getElementById('dragHandle');
     let isResizing = false;
 
     handle.addEventListener('mousedown', (e) => {
         isResizing = true;
+        document.body.style.cursor = 'ew-resize';
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', () => {
             isResizing = false;
+            document.body.style.cursor = 'default';
             document.removeEventListener('mousemove', handleMouseMove);
         });
     });
@@ -146,7 +143,7 @@
     function handleMouseMove(e) {
         if (!isResizing) return;
         const newWidth = window.innerWidth - e.clientX;
-        if (newWidth > 200 && newWidth < 600) {
+        if (newWidth > 150 && newWidth < 800) {
             panel.style.width = newWidth + 'px';
         }
     }
@@ -154,9 +151,7 @@
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(devices)); }
 
     function initGrid() {
-        // Load Theme
         if(localStorage.getItem('matrix_theme') === 'light') toggleTheme();
-        
         const grid = document.getElementById('redmiGrid');
         grid.innerHTML = '';
         devices.forEach(dev => createBoxInDOM(dev));
@@ -169,6 +164,7 @@
         col.className = 'redmi-col';
         col.id = `col-${dev.id}`;
         col.style.width = dev.width + 'px';
+        col.style.flex = "0 0 auto";
         
         col.innerHTML = `
             <div class="redmi-frame" id="frame-${dev.id}" style="height: ${dev.height}px;">
@@ -187,21 +183,34 @@
             row.className = 'url-row';
             row.innerHTML = `
                 <span class="device-label">📱 DEVICE #${index + 1}</span>
-                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL पेस्ट करें..." value="${dev.url}">
+                <input type="text" class="url-input" id="in-url-${dev.id}" placeholder="URL यहाँ डालें..." value="${dev.url}">
                 
                 <div class="dim-inputs">
-                    <input type="number" id="w-${dev.id}" value="${dev.width}" placeholder="W">
-                    <input type="number" id="h-${dev.id}" value="${dev.height}" placeholder="H">
+                    <input type="number" id="w-${dev.id}" value="${dev.width}" title="Width">
+                    <input type="number" id="h-${dev.id}" value="${dev.height}" title="Height">
                 </div>
 
                 <button class="apply-btn" onclick="updateDeviceConfig('${dev.id}')">Apply Settings</button>
-                <div style="display: flex; gap: 5px;">
+                <div class="action-group">
                     <button class="load-btn" onclick="loadUrlOnly('${dev.id}')">⚡ Load</button>
+                    <button class="refresh-btn" onclick="refreshBox('${dev.id}')">🔄 Refresh</button>
                     <button class="del-btn" onclick="removeDevice('${dev.id}')">Del</button>
                 </div>
             `;
             list.appendChild(row);
         });
+    }
+
+    // नई Refresh फंक्शनैलिटी
+    function refreshBox(id) {
+        const iframe = document.getElementById(`iframe-${id}`);
+        if (iframe) {
+            const currentSrc = iframe.src;
+            iframe.src = 'about:blank'; // फ्लैश इफेक्ट के लिए
+            setTimeout(() => {
+                iframe.src = currentSrc;
+            }, 100);
+        }
     }
 
     function updateDeviceConfig(id) {
@@ -212,8 +221,10 @@
             dev.width = parseInt(newW);
             dev.height = parseInt(newH);
             save();
-            document.getElementById(`col-${id}`).style.width = newW + 'px';
-            document.getElementById(`frame-${id}`).style.height = newH + 'px';
+            const col = document.getElementById(`col-${id}`);
+            const frame = document.getElementById(`frame-${id}`);
+            if(col) col.style.width = newW + 'px';
+            if(frame) frame.style.height = newH + 'px';
         }
     }
 
@@ -222,9 +233,11 @@
         let finalUrl = urlInput;
         if(finalUrl && !/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
         const dev = devices.find(d => d.id === id);
-        dev.url = finalUrl;
-        save();
-        document.getElementById(`iframe-${id}`).src = finalUrl || 'about:blank';
+        if(dev) {
+            dev.url = finalUrl;
+            save();
+            document.getElementById(`iframe-${id}`).src = finalUrl || 'about:blank';
+        }
     }
 
     function addDevice() {
@@ -239,7 +252,8 @@
         if(confirm("Delete this box?")) {
             devices = devices.filter(d => d.id !== id);
             save();
-            document.getElementById(`col-${id}`).remove();
+            const el = document.getElementById(`col-${id}`);
+            if(el) el.remove();
             renderControlPanel();
         }
     }
